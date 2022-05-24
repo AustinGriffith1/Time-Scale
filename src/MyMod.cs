@@ -1,13 +1,15 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
+using UnityEngine;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SideLoader;
 
-namespace OutwardModTemplate
+namespace TimeScaleHotkey
 {
     /* ~~~ Initial Setup ~~~
      * 
@@ -20,12 +22,12 @@ namespace OutwardModTemplate
      */
 
     [BepInPlugin(GUID, NAME, VERSION)]
-    public class MyMod : BaseUnityPlugin
+    public class TimeScaleHotkey : BaseUnityPlugin
     {
         // Choose a GUID for your project. Change "myname" and "mymod".
-        public const string GUID = "myname.mymod";
+        public const string GUID = "chickensalad.TimeScaleHotkey";
         // Choose a NAME for your project, generally the same as your Assembly Name.
-        public const string NAME = "MyMod";
+        public const string NAME = "TimeScaleHotkey";
         // Increment the VERSION when you release a new version of your mod.
         public const string VERSION = "1.0.0";
 
@@ -42,22 +44,27 @@ namespace OutwardModTemplate
             Log.LogMessage($"Hello world from {NAME} {VERSION}!");
 
             // Any config settings you define should be set up like this:
-            ExampleConfig = Config.Bind("ExampleCategory", "ExampleSetting", false, "This is an example setting.");
+            // ExampleConfig = Config.Bind("ExampleCategory", "ExampleSetting", false, "This is an example setting.");
 
             // Harmony is for patching methods. If you're not patching anything, you can comment-out or delete this line.
-            new Harmony(GUID).PatchAll();
+            //new Harmony(GUID).PatchAll();
+
+            CustomKeybindings.AddAction("TimeScale*4", KeybindingsCategory.CustomKeybindings, ControlType.Both);
         }
 
         // Update is called once per frame. Use this only if needed.
         // You also have all other MonoBehaviour methods available (OnGUI, etc)
         internal void Update()
         {
-
+            if (CustomKeybindings.GetKeyDown("TimeScale*4"))
+            {
+                if (Time.timeScale <= 1)
+                    Time.timeScale = 4;
+                else
+                    Time.timeScale = 1;
+            }
         }
 
-        // This is an example of a Harmony patch.
-        // If you're not using this, you should delete it.
-        [HarmonyPatch(typeof(ResourcesPrefabManager), nameof(ResourcesPrefabManager.Load))]
         public class ResourcesPrefabManager_Load
         {
             static void Postfix()
